@@ -131,6 +131,7 @@ const seedDatabase = async () => {
         role: 'admin',
         branchId: branch1._id,
         isActive: true,
+        isEmailVerified: true,
       },
       {
         name: 'Nguyễn Thị Thu (Giáo vụ)',
@@ -140,6 +141,7 @@ const seedDatabase = async () => {
         role: 'staff',
         branchId: branch1._id,
         isActive: true,
+        isEmailVerified: true,
       },
       {
         name: 'Sensei Yamada Kenji',
@@ -150,6 +152,7 @@ const seedDatabase = async () => {
         branchId: branch1._id,
         salaryRatePerHour: 250000,
         isActive: true,
+        isEmailVerified: true,
       },
       {
         name: 'Sensei Trần Thị Mai (N2)',
@@ -160,6 +163,7 @@ const seedDatabase = async () => {
         branchId: branch1._id,
         salaryRatePerHour: 180000,
         isActive: true,
+        isEmailVerified: true,
       },
     ]);
     const teacherMai = users[3];

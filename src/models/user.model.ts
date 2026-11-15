@@ -10,8 +10,12 @@ export interface IUser extends Document {
   role: UserRole;
   branchId?: mongoose.Types.ObjectId;
   isActive: boolean;
+  isEmailVerified: boolean;
+  googleId?: string;
+  firebaseUid?: string;
   avatar?: string;
   salaryRatePerHour?: number;
+  tokenVersion: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -59,9 +63,29 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: true,
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    googleId: {
+      type: String,
+      trim: true,
+      sparse: true,
+      index: true,
+    },
+    firebaseUid: {
+      type: String,
+      trim: true,
+      sparse: true,
+      index: true,
+    },
     avatar: {
       type: String,
       default: '',
+    },
+    tokenVersion: {
+      type: Number,
+      default: 0,
     },
   },
   {

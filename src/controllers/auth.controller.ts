@@ -11,8 +11,36 @@ export class AuthController {
       ApiResponse.success({
         res,
         data: result,
-        message: 'Đăng ký tài khoản thành công',
+        message: result.message,
         statusCode: HTTP_STATUS.CREATED,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.verifyOtp(req.body);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resendOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.resendOtp(req.body.email);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
       });
     } catch (error) {
       next(error);
@@ -33,6 +61,35 @@ export class AuthController {
     }
   }
 
+  static async googleAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = req.body.idToken || req.body.credential;
+      const result = await AuthService.googleAuth(token);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async firebaseAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.firebaseAuthSync(req.body.idToken);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: 'Xác thực tài khoản Firebase thành công',
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getMe(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const user = await AuthService.getMe(req.user!.userId);
@@ -40,6 +97,34 @@ export class AuthController {
         res,
         data: user,
         message: 'Lấy thông tin cá nhân thành công',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async refreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.refreshToken(req.body.refreshToken);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async logout(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.logout(req.user!.userId);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
       });
     } catch (error) {
       next(error);
