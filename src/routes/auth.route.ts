@@ -10,6 +10,8 @@ import {
   firebaseAuthSchema,
   refreshTokenSchema,
   googleAuthSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validations/auth.validation';
 
 const router = Router();
@@ -358,5 +360,34 @@ router.post('/firebase-auth', validate(firebaseAuthSchema), AuthController.fireb
  *         description: Chưa đăng nhập hoặc Token không hợp lệ / hết hạn
  */
 router.get('/me', authenticate, AuthController.getMe);
+router.put('/me', authenticate, AuthController.updateProfile);
+router.put('/change-password', authenticate, AuthController.changePassword);
+
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Yêu cầu mã OTP đặt lại mật khẩu gửi về email
+ *     tags: [Auth]
+ */
+router.post('/forgot-password', validate(forgotPasswordSchema), AuthController.forgotPassword);
+
+/**
+ * @swagger
+ * /auth/verify-reset-otp:
+ *   post:
+ *     summary: Xác thực mã OTP trước khi mở bước đổi mật khẩu
+ *     tags: [Auth]
+ */
+router.post('/verify-reset-otp', validate(verifyOtpSchema), AuthController.verifyResetOtp);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Đặt lại mật khẩu mới bằng mã OTP xác thực
+ *     tags: [Auth]
+ */
+router.post('/reset-password', validate(resetPasswordSchema), AuthController.resetPassword);
 
 export default router;

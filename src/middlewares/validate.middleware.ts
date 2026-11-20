@@ -6,16 +6,25 @@ import { ApiResponse } from '../utils/apiResponse';
 export const validate = (schema: ZodType<any>) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const parsed: any = await schema.parseAsync({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
+      const isWrapped = 'shape' in schema && Boolean((schema as any).shape?.body);
+      const toParse = isWrapped
+        ? {
+            body: req.body,
+            query: req.query,
+            params: req.params,
+          }
+        : req.body;
+
+      const parsed: any = await schema.parseAsync(toParse);
 
       // assign parsed data back to req
-      if (parsed.body) req.body = parsed.body;
-      if (parsed.query) req.query = parsed.query;
-      if (parsed.params) req.params = parsed.params;
+      if (isWrapped) {
+        if (parsed?.body) req.body = parsed.body;
+        if (parsed?.query) req.query = parsed.query;
+        if (parsed?.params) req.params = parsed.params;
+      } else {
+        req.body = parsed;
+      }
 
       next();
     } catch (error) {

@@ -8,6 +8,7 @@ import { JwtPayload, RefreshTokenPayload, TokenPair, UserRole } from '../types';
 import { FirebaseService } from './firebase.service';
 import { MailService } from './mail.service';
 import { OtpUtil } from '../utils/otp.util';
+import { UploadService } from './upload.service';
 
 const googleClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID || undefined);
 
@@ -485,5 +486,140 @@ export class AuthService {
       throw new AppError('Không tìm thấy thông tin người dùng', HTTP_STATUS.NOT_FOUND);
     }
     return user;
+  }
+
+  static async updateProfile(userId: string, data: { name?: string; phone?: string; avatar?: string }) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError('Không tìm thấy người dùng', HTTP_STATUS.NOT_FOUND);
+    }
+    if (data.name) user.name = data.name.trim();
+    if (data.phone !== undefined) user.phone = data.phone.trim();
+    if (data.avatar !== undefined) {
+      if (data.avatar && data.avatar.startsWith('data:image/')) {
+        const cloudinaryUrl = await UploadService.uploadAvatar(data.avatar, userId);
+        user.avatar = cloudinaryUrl;
+      } else {
+        user.avatar = data.avatar;
+      }
+    }
+    await user.save();
+
+    const userObj = user.toObject();
+    delete userObj.password;
+    return userObj;
+  }
+
+  static async changePassword(userId: string, data: { currentPassword: string; newPassword: string }) {
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      throw new AppError('Không tìm thấy người dùng', HTTP_STATUS.NOT_FOUND);
+    }
+
+    const isMatch = await user.comparePassword(data.currentPassword);
+    if (!isMatch) {
+      throw new AppError('Mật khẩu hiện tại không chính xác', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    user.password = data.newPassword;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    await user.save();
+
+    return {
+      message: 'Đổi mật khẩu thành công!',
+    };
+  }
+
+  /**
+   * Yêu cầu đặt lại mật khẩu - Gửi mã OTP xác thực qua email
+   */
+  static async forgotPassword(email: string) {
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      throw new AppError('Không tìm thấy tài khoản với email này trong hệ thống.', HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (!user.isActive) {
+      throw new AppError('Tài khoản này đã bị khóa hoặc vô hiệu hóa.', HTTP_STATUS.FORBIDDEN);
+    }
+
+    const otpResult = await this.createAndSendOtp(user.email, user.name);
+
+    return {
+      email: user.email,
+      otpToken: otpResult.otpToken,
+      expiresInMinutes: otpResult.expiresInMinutes,
+      message: `Mã OTP xác thực đặt lại mật khẩu đã được gửi đến email ${user.email}.`,
+      ...(ENV.NODE_ENV === 'development' && !otpResult.sentViaSmtp ? { devOtp: otpResult.otp } : {}),
+    };
+  }
+
+  /**
+   * Xác thực mã OTP trước khi mở bước nhập mật khẩu mới
+   */
+  static async verifyResetOtp({
+    email,
+    otp,
+    otpToken,
+  }: {
+    email: string;
+    otp: string;
+    otpToken: string;
+  }) {
+    const normalizedEmail = email.toLowerCase().trim();
+    const verification = OtpUtil.verifyOtpToken(normalizedEmail, otp, otpToken);
+    if (!verification.valid) {
+      if (verification.reason === 'EXPIRED') {
+        throw new AppError('Mã OTP đã hết hạn. Vui lòng bấm gửi lại mã mới.', HTTP_STATUS.BAD_REQUEST);
+      }
+      throw new AppError('Mã OTP không chính xác. Vui lòng kiểm tra lại.', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    return {
+      valid: true,
+      message: 'Mã OTP chính xác. Mời bạn tiến hành đặt mật khẩu mới.',
+    };
+  }
+
+  /**
+   * Đặt lại mật khẩu mới bằng mã OTP xác thực
+   */
+  static async resetPassword({
+    email,
+    otp,
+    otpToken,
+    newPassword,
+  }: {
+    email: string;
+    otp: string;
+    otpToken: string;
+    newPassword: string;
+  }) {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // 1. Kiểm tra tính hợp lệ của OTP
+    const verification = OtpUtil.verifyOtpToken(normalizedEmail, otp, otpToken);
+    if (!verification.valid) {
+      if (verification.reason === 'EXPIRED') {
+        throw new AppError('Mã OTP đã hết hạn. Vui lòng bấm gửi lại mã mới.', HTTP_STATUS.BAD_REQUEST);
+      }
+      throw new AppError('Mã OTP hoặc token xác thực không chính xác.', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    // 2. Tìm tài khoản người dùng
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+    if (!user) {
+      throw new AppError('Không tìm thấy người dùng.', HTTP_STATUS.NOT_FOUND);
+    }
+
+    // 3. Đổi mật khẩu mới và tăng tokenVersion để vô hiệu hóa các token cũ
+    user.password = newPassword;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    await user.save();
+
+    return {
+      message: 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.',
+    };
   }
 }

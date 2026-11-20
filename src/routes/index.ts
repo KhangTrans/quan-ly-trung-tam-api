@@ -2,6 +2,14 @@ import { Router } from 'express';
 import authRoutes from './auth.route';
 import courseRoutes from './course.route';
 import enrollmentRoutes from './enrollment.route';
+import branchRoutes from './branch.route';
+import classroomRoutes from './classroom.route';
+import shiftSlotRoutes from './shiftSlot.route';
+import classRoutes from './class.route';
+import auditLogRoutes from './auditLog.route';
+import studentRoutes from './student.route';
+import invoiceRoutes from './invoice.route';
+import examResultRoutes from './examResult.route';
 import { ApiResponse } from '../utils/apiResponse';
 
 const router = Router();
@@ -43,5 +51,13 @@ router.get('/health', (_req, res) => {
 router.use('/auth', authRoutes);
 router.use('/courses', courseRoutes);
 router.use('/enrollments', enrollmentRoutes);
+router.use('/branches', branchRoutes);
+router.use('/classrooms', classroomRoutes);
+router.use('/shift-slots', shiftSlotRoutes);
+router.use('/classes', classRoutes);
+router.use('/audit-logs', auditLogRoutes);
+router.use('/students', studentRoutes);
+router.use('/invoices', invoiceRoutes);
+router.use('/exam-results', examResultRoutes);
 
 export default router;

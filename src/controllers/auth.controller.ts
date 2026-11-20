@@ -103,6 +103,32 @@ export class AuthController {
     }
   }
 
+  static async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const updatedUser = await AuthService.updateProfile(req.user!.userId, req.body);
+      ApiResponse.success({
+        res,
+        data: updatedUser,
+        message: 'Cập nhật thông tin cá nhân thành công',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.changePassword(req.user!.userId, req.body);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await AuthService.refreshToken(req.body.refreshToken);
@@ -120,6 +146,48 @@ export class AuthController {
   static async logout(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const result = await AuthService.logout(req.user!.userId);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.forgotPassword(req.body.email);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyResetOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.verifyResetOtp(req.body);
+      ApiResponse.success({
+        res,
+        data: result,
+        message: result.message,
+        statusCode: HTTP_STATUS.OK,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await AuthService.resetPassword(req.body);
       ApiResponse.success({
         res,
         data: result,
