@@ -19,6 +19,7 @@ export interface ICourse extends Document {
   level: JapaneseLevel;
   description?: string;
   textbook: string;
+  textbookId?: mongoose.Types.ObjectId;
   totalSessions: number;
   tuitionFee: number;
   duration?: string;
@@ -69,6 +70,10 @@ const courseSchema = new Schema<ICourse>(
       type: String,
       default: 'Minna no Nihongo I',
       trim: true,
+    },
+    textbookId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Textbook',
     },
     totalSessions: {
       type: Number,

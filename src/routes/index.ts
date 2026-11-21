@@ -10,6 +10,7 @@ import auditLogRoutes from './auditLog.route';
 import studentRoutes from './student.route';
 import invoiceRoutes from './invoice.route';
 import examResultRoutes from './examResult.route';
+import textbookRoutes from './textbook.route';
 import { ApiResponse } from '../utils/apiResponse';
 
 const router = Router();
@@ -59,5 +60,6 @@ router.use('/audit-logs', auditLogRoutes);
 router.use('/students', studentRoutes);
 router.use('/invoices', invoiceRoutes);
 router.use('/exam-results', examResultRoutes);
+router.use('/textbooks', textbookRoutes);
 
 export default router;

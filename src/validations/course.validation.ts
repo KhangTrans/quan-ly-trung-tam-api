@@ -20,6 +20,7 @@ export const createCourseSchema = z.object({
     level: z.enum(JAPANESE_LEVELS, { message: 'Trình độ tiếng Nhật không hợp lệ' }),
     description: z.string().optional().default(''),
     textbook: z.string().optional().default('Minna no Nihongo I'),
+    textbookId: z.string().optional().nullable(),
     totalSessions: z.coerce
       .number({ message: 'Tổng số buổi học phải là số' })
       .min(1, 'Số buổi học tối thiểu là 1')
@@ -41,6 +42,7 @@ export const updateCourseSchema = z.object({
     level: z.enum(JAPANESE_LEVELS).optional(),
     description: z.string().optional(),
     textbook: z.string().optional(),
+    textbookId: z.string().optional().nullable(),
     totalSessions: z.coerce.number().min(1).optional(),
     tuitionFee: z.coerce.number().min(0).optional(),
     duration: z.string().optional(),

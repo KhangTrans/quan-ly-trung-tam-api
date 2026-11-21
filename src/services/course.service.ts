@@ -50,7 +50,7 @@ export class CourseService {
     const skip = (page - 1) * limit;
 
     const [courses, total] = await Promise.all([
-      Course.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Course.find(query).populate('textbookId').sort({ createdAt: -1 }).skip(skip).limit(limit),
       Course.countDocuments(query),
     ]);
 
@@ -66,7 +66,7 @@ export class CourseService {
   }
 
   static async getCourseById(id: string) {
-    const course = await Course.findById(id);
+    const course = await Course.findById(id).populate('textbookId');
     if (!course) {
       throw new AppError('Khóa học không tồn tại', HTTP_STATUS.NOT_FOUND);
     }

@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -16,6 +17,7 @@ const app: Application = express();
 app.use(
   helmet({
     contentSecurityPolicy: false, // Cho phép Swagger UI load style và script inline
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Cho phép iframe đọc file PDF tĩnh
   })
 );
 app.use(
@@ -24,8 +26,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Static uploads directory (serving uploaded PDF textbooks, etc.)
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 if (ENV.NODE_ENV === 'development') {
   app.use(morgan('dev'));
