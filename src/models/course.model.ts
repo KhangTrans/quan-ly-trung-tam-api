@@ -1,6 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export type JapaneseLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | 'Kaiwa';
+export type JapaneseLevel =
+  | 'N5'
+  | 'N4'
+  | 'N3'
+  | 'N2'
+  | 'N1'
+  | 'Kaiwa'
+  | 'Luyện thi JLPT'
+  | 'Luyện thi NAT-TEST'
+  | 'JLPT'
+  | 'NAT-TEST';
 export type CourseStatus = 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
 
 export interface ICourse extends Document {
@@ -37,7 +47,18 @@ const courseSchema = new Schema<ICourse>(
     },
     level: {
       type: String,
-      enum: ['N5', 'N4', 'N3', 'N2', 'N1', 'Kaiwa'],
+      enum: [
+        'N5',
+        'N4',
+        'N3',
+        'N2',
+        'N1',
+        'Kaiwa',
+        'Luyện thi JLPT',
+        'Luyện thi NAT-TEST',
+        'JLPT',
+        'NAT-TEST',
+      ],
       required: [true, 'Trình độ tiếng Nhật là bắt buộc'],
     },
     description: {
