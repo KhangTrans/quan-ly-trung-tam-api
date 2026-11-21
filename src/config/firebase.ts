@@ -46,15 +46,15 @@ function initializeFirebase(): void {
         }),
       });
       isConfigured = true;
-      console.log('🔥 [Firebase] Đã khởi tạo Firebase Admin từ biến môi trường');
+      console.log('[Firebase] Đã khởi tạo Firebase Admin từ biến môi trường');
       return;
     }
 
     console.warn(
-      '⚠️ [Firebase] Chưa cấu hình thông tin Firebase Admin (FIREBASE_PROJECT_ID hoặc FIREBASE_SERVICE_ACCOUNT_PATH). Một số chức năng xác thực qua Firebase sẽ bị hạn chế cho đến khi cấu hình.'
+      '[Firebase] Chưa cấu hình thông tin Firebase Admin (FIREBASE_PROJECT_ID hoặc FIREBASE_SERVICE_ACCOUNT_PATH). Một số chức năng xác thực qua Firebase sẽ bị hạn chế cho đến khi cấu hình.'
     );
   } catch (error) {
-    console.error('❌ [Firebase] Lỗi khởi tạo Firebase Admin:', error);
+    console.error('[Firebase] Lỗi khởi tạo Firebase Admin:', error);
     isConfigured = false;
   }
 }

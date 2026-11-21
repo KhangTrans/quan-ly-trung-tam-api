@@ -10,10 +10,10 @@ const startServer = async () => {
     // 2. Start HTTP Server
     const server = app.listen(ENV.PORT, () => {
       console.log(`===============================================`);
-      console.log(`🚀 Minh Tu Center Backend running on port ${ENV.PORT}`);
-      console.log(`📡 Environment: ${ENV.NODE_ENV}`);
-      console.log(`🔗 API Base URL: http://localhost:${ENV.PORT}/api/v1`);
-      console.log(`🩺 Health check: http://localhost:${ENV.PORT}/api/v1/health`);
+      console.log(`Minh Tu Center Backend running on port ${ENV.PORT}`);
+      console.log(`Environment: ${ENV.NODE_ENV}`);
+      console.log(`API Base URL: http://localhost:${ENV.PORT}/api/v1`);
+      console.log(`Health check: http://localhost:${ENV.PORT}/api/v1/health`);
       console.log(`===============================================`);
     });
 
