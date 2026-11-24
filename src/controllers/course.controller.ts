@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { CourseService } from '../services/course.service';
 import { ApiResponse } from '../utils/apiResponse';
 import { HTTP_STATUS } from '../constants/httpStatus';
+import { extractAuditContext } from '../utils/auditHelper';
+import { AuthRequest } from '../types';
 
 export class CourseController {
   static async getAllCourses(req: Request, res: Response, next: NextFunction) {
@@ -13,7 +15,7 @@ export class CourseController {
         status: status as string,
         search: search as string,
         page: page ? parseInt(page as string, 10) : 1,
-        limit: limit ? parseInt(limit as string, 10) : 10,
+        limit: limit ? parseInt(limit as string, 10) : 100,
       });
 
       ApiResponse.success({
@@ -41,9 +43,10 @@ export class CourseController {
     }
   }
 
-  static async createCourse(req: Request, res: Response, next: NextFunction) {
+  static async createCourse(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const course = await CourseService.createCourse(req.body);
+      const context = extractAuditContext(req);
+      const course = await CourseService.createCourse(req.body, context);
 
       ApiResponse.success({
         res,
@@ -56,10 +59,11 @@ export class CourseController {
     }
   }
 
-  static async updateCourse(req: Request, res: Response, next: NextFunction) {
+  static async updateCourse(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const course = await CourseService.updateCourse(id as string, req.body);
+      const context = extractAuditContext(req);
+      const course = await CourseService.updateCourse(id as string, req.body, context);
 
       ApiResponse.success({
         res,
@@ -71,10 +75,11 @@ export class CourseController {
     }
   }
 
-  static async deleteCourse(req: Request, res: Response, next: NextFunction) {
+  static async deleteCourse(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      await CourseService.deleteCourse(id as string);
+      const context = extractAuditContext(req);
+      await CourseService.deleteCourse(id as string, context);
 
       ApiResponse.success({
         res,

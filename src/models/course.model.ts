@@ -1,6 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export type JapaneseLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | 'Kaiwa';
+export type JapaneseLevel =
+  | 'N5'
+  | 'N4'
+  | 'N3'
+  | 'N2'
+  | 'N1'
+  | 'Kaiwa'
+  | 'Luyện thi JLPT'
+  | 'Luyện thi NAT-TEST'
+  | 'JLPT'
+  | 'NAT-TEST';
 export type CourseStatus = 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
 
 export interface ICourse extends Document {
@@ -9,6 +19,7 @@ export interface ICourse extends Document {
   level: JapaneseLevel;
   description?: string;
   textbook: string;
+  textbookId?: mongoose.Types.ObjectId;
   totalSessions: number;
   tuitionFee: number;
   duration?: string;
@@ -37,7 +48,18 @@ const courseSchema = new Schema<ICourse>(
     },
     level: {
       type: String,
-      enum: ['N5', 'N4', 'N3', 'N2', 'N1', 'Kaiwa'],
+      enum: [
+        'N5',
+        'N4',
+        'N3',
+        'N2',
+        'N1',
+        'Kaiwa',
+        'Luyện thi JLPT',
+        'Luyện thi NAT-TEST',
+        'JLPT',
+        'NAT-TEST',
+      ],
       required: [true, 'Trình độ tiếng Nhật là bắt buộc'],
     },
     description: {
@@ -48,6 +70,10 @@ const courseSchema = new Schema<ICourse>(
       type: String,
       default: 'Minna no Nihongo I',
       trim: true,
+    },
+    textbookId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Textbook',
     },
     totalSessions: {
       type: Number,

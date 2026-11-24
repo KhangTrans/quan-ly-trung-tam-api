@@ -8,6 +8,17 @@ export interface JwtPayload {
   email: string;
 }
 
+export interface RefreshTokenPayload {
+  userId: string;
+  tokenVersion: number;
+}
+
+export interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+  token: string;
+}
+
 export interface AuthRequest extends Request {
   user?: JwtPayload;
 }

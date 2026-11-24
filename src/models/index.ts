@@ -15,3 +15,4 @@ export * from './examResult.model';
 export * from './invoice.model';
 export * from './paymentTransaction.model';
 export * from './auditLog.model';
+export * from './textbook.model';
